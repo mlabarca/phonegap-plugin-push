@@ -14,6 +14,8 @@
   - [Picture Messages](#picture-messages)
   - [Background Notifications](#background-notifications)
     - [Use of content-available: true](#use-of-content-available-true)
+  - [Visibility](#visibility-of-notifications)
+  - [Badges](#badges)
 - [iOS Behaviour](#ios-behaviour)
   - [Sound](#sound-1)
   - [Background Notifications](#background-notifications-1)
@@ -689,6 +691,7 @@ This will produce the following notification in your tray:
 
 ![2015-08-25 16 08 00](https://cloud.githubusercontent.com/assets/353180/9472260/3655fa7a-4b22-11e5-8d87-20528112de16.png)
 
+> Note: When the notification arrives you will see the title and message like normally. You will only see the picture when the notification is expanded. Once expanded not only will you see the picture but the message portion will disappear and you'll see the summary text portion.
 
 ## Background Notifications
 
@@ -826,6 +829,41 @@ var message = new gcm.Message();
 message.addData('title', 'This is a public Notification');
 message.addData('message', 'You should be able to read this notification on your lock screen');
 message.addData('visibility', 1);
+service.send(message, { registrationTokens: [ deviceID ] }, function (err, response) {
+	if(err) console.error(err);
+	else 	console.log(response);
+});
+```
+
+## Badges
+
+On Android not all launchers support badges. In order for us to set badges we use [ShortcutBadger](https://github.com/leolin310148/ShortcutBadger) in order to set the badge. Check out their website to see which launchers are supported.
+
+In order to set the badge number you will need to include the `badge` property in your push payload as below:
+
+```javascript
+{
+    "registration_ids": ["my device id"],
+    "data": {
+    	"title": "Badge Test",
+    	"message": "Badges, we don't need no stinking badges",
+    	"badge": 7
+    }
+}
+```
+
+Here is an example using node-gcm that sends the above JSON:
+
+```javascript
+var gcm = require('node-gcm');
+// Replace these with your own values.
+var apiKey = "replace with API key";
+var deviceID = "my device id";
+var service = new gcm.Sender(apiKey);
+var message = new gcm.Message();
+message.addData('title', 'Badge Test');
+message.addData('message', 'Badges, we don\'t need no stinking badges');
+message.addData('badge', 7);
 service.send(message, { registrationTokens: [ deviceID ] }, function (err, response) {
 	if(err) console.error(err);
 	else 	console.log(response);
